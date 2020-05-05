@@ -1,0 +1,27 @@
+{% extends "layout.html"%}
+{% block content%}
+
+<div class="row">
+
+    <div class="col-12">
+        <h1>Add Question</h1>
+        <form action="" method="post">
+            <div class="form-group">
+                <input type="text" name="question" class="form-control" placeholder="Enter Question">
+            </div>
+
+            <div class="form-group">
+                <input type="text" name="description" class="form-control" placeholder="Description">
+            </div>
+            <br>
+             <p style="font-size:20px;"> I am ready to pay </p>
+            <div class="form-group">
+                <input type="number" name="pay" class="form-control" placeholder="Enter amount" >
+            </div>
+
+            <button type="submit" class="btn btn-dark text-center">Add</button>
+        </form>
+    </div>
+
+</div>
+{% endblock%}

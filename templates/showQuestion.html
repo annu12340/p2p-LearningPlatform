@@ -1,0 +1,19 @@
+{% extends "layout.html"%} {% block content%}
+
+<h1>Show All Questions</h1>
+
+
+<div>
+    {% for i in showQuestion %}
+        {{i.id}}. {{ i.question }} <br>
+        {{i.description}} <br>
+        Amount that would be paid: {{i.pay}}
+        <hr>
+    {% endfor %}
+</div>
+
+
+<h2>The end</h2>
+
+
+{% endblock%}

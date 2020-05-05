@@ -1,15 +1,21 @@
 body{
-color:#1864ab;
+color: #1864ab;
 background-color:#f1f3f5;
 font-size:20px;
-
 }
+
+
 .navbar{
 margin-bottom:1%;
 }
 
+li{
+    font-size:20px;
+}
+
 
 .content{
+font-size:20px;
 padding:2%;
 margin:5%;
 

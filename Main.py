@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -15,7 +16,18 @@ class User(db.Model):
     score = db.Column(db.Integer, default=200)
 
 
-@app.route('/', methods=['GET', 'POST'])
+class Question(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    question = db.Column(db.String(50))
+    description = db.Column(db.String(200))
+    pay = db.Column(db.Integer)
+    askedby_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+
+
+################################  REGISTER  LOGIN  LOGOUT ROUTES ###################################
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -50,31 +62,52 @@ def logout():
     return redirect(url_for('login'))
 
 
-#############################################################################
-
-@app.route('/home')
-def home():
-    return 'home'
-
+####################################  ROUTES TO DISPLAY #########################################
 
 @app.route('/show')
 def show():
     show_user = User.query.all()
     return render_template('show.html', show_user=show_user)
 
-@app.route('/add')
+
+@app.route('/showQuestion')
+def showQuestion():
+    showQuestion = Question.query.order_by(desc(Question.id))
+    return render_template('showQuestion.html', showQuestion=showQuestion)
+
+
+
+####################################  OTHER ROUTES  #########################################
+
+
+@app.route('/index')
+def index():
+    showQuestion = Question.query.all()
+    return render_template('index.html', showQuestion=showQuestion)
+
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/add', methods=['GET', 'POST'])
 def add():
-    return 'add'
+    if request.method == 'POST':
 
+        new_question = Question(question = request.form['question'],
+                        description=request.form['description'],
+                            pay=request.form['pay'])
+        db.session.add(new_question)
+        db.session.commit()
+        return redirect(url_for('showQuestion'))
+    else:
 
-#############################################################################
+        return render_template('AddQuestion.html')
+
 
 @app.route('/history')
 def history():
     return 'History'
 
 
-#############################################################################
+######################################### MAIN ####################################
 
 
 if __name__ == '__main__':
