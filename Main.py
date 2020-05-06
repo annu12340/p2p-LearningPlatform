@@ -41,7 +41,7 @@ def login():
         if data is not None:
             session['user'] = data.id
             print session['user']
-            return redirect(url_for('home'))
+            return redirect(url_for('index'))
         return render_template('incorrectLogin.html')
 
 
@@ -90,10 +90,11 @@ def index():
 @app.route('/add', methods=['GET', 'POST'])
 def add():
     if request.method == 'POST':
-
+        user_id = session['user']
+        print(user_id)
         new_question = Question(question = request.form['question'],
                         description=request.form['description'],
-                            pay=request.form['pay'])
+                            pay=request.form['pay'],askedby_id= user_id )
         db.session.add(new_question)
         db.session.commit()
         return redirect(url_for('showQuestion'))
@@ -101,6 +102,16 @@ def add():
 
         return render_template('AddQuestion.html')
 
+
+
+@app.route('/ParticularQuestion')
+def ParticularQuestion():
+    id=request.args
+    print(id)
+    q = Question.query.get(id)
+    user=q.askedby_id
+    email=User.query.get(user).email
+    return render_template('ParticularQuestion.html',question=q,email=email)
 
 @app.route('/history')
 def history():
