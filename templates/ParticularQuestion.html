@@ -8,10 +8,51 @@
 <hr>
 <br>
 
- {{question.description}}
+{{question.description}}
 <br>
 Pay : {{question.pay}}
 <br>
 {{email}}
 
+<br><br>
+<h1>Responses</h1>
+<ol>
+
+
+        {% for i in response %}
+    <li>
+        Email: {{i.email}}<br>
+        {{ i.description }} <br>
+        Suggested amount : {{i.pay}}
+        <hr>
+        {% endfor %}
+    </li>
+
+</ol>
+
+
+<br><br>
+<form action="" method="post" style="background:grey; padding:5%">
+    <div class="form-group">
+        <label>Question Id</label>
+        <input type="number" name="id" class="form-control" placeholder="{{question.id}}">
+
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <input type="text" name="email" class="form-control" placeholder="Enter email">
+
+    </div>
+    <div class="form-group">
+        <label>Why do you think you are the right fit ?</label>
+        <input type="text" name="description" class="form-control" placeholder="Enter description">
+
+    </div>
+    <div class="form-group">
+        <label>Expected amount</label>
+        <input type="number" name="pay" class="form-control" placeholder="Amount">
+    </div>
+
+    <button type="submit" class="btn btn-dark">Submit</button>
+</form>
 {% endblock%}

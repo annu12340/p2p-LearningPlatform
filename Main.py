@@ -24,6 +24,13 @@ class Question(db.Model):
     askedby_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
+class Response(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(50))
+    description = db.Column(db.String(200))
+    pay = db.Column(db.Integer)
+    questionID   = db.Column(db.Integer, db.ForeignKey('question.id'))
+
 
 ################################  REGISTER  LOGIN  LOGOUT ROUTES ###################################
 
@@ -76,13 +83,17 @@ def showQuestion():
     return render_template('showQuestion.html', showQuestion=showQuestion)
 
 
+@app.route('/showResponse')
+def showResponse():
+    showResponse = Response.query.all()
+    return render_template('showResponse.html', showResponse=showResponse)
 
 ####################################  OTHER ROUTES  #########################################
 
 
 @app.route('/index')
 def index():
-    showQuestion = Question.query.all()
+    showQuestion = Question.query.order_by(desc(Question.id))
     return render_template('index.html', showQuestion=showQuestion)
 
 
@@ -92,9 +103,9 @@ def add():
     if request.method == 'POST':
         user_id = session['user']
         print(user_id)
-        new_question = Question(question = request.form['question'],
-                        description=request.form['description'],
-                            pay=request.form['pay'],askedby_id= user_id )
+        new_question = Question(question=request.form['question'],
+                                description=request.form['description'],
+                                pay=request.form['pay'], askedby_id=user_id)
         db.session.add(new_question)
         db.session.commit()
         return redirect(url_for('showQuestion'))
@@ -103,16 +114,66 @@ def add():
         return render_template('AddQuestion.html')
 
 
-
-@app.route('/ParticularQuestion')
+@app.route('/ParticularQuestion', methods=['GET', 'POST'])
 def ParticularQuestion():
-    id=request.args
+    if request.method == 'POST':
+        id = request.args
+        print((id))
+        new_response = Response(email=request.form['email'],
+                        description=request.form['description'],
+                            pay=request.form['pay'], questionID=request.form['id'])
+        db.session.add(new_response)
+        db.session.commit()
+        return redirect(url_for('index'))
+    else:
+        id = request.args
+        print(id)
+        q = Question.query.get(id)
+        user = q.askedby_id
+        email = User.query.get(user).email
+
+        response=Response.query.filter_by(questionID=q.id).all()
+        print("response is",response)
+        return render_template('ParticularQuestion.html', question=q, email=email,response=response)
+
+
+@app.route('/myQuestion')
+def myQuestion():
+    user_id = session['user']
+    myQuestion = Question.query.filter_by(askedby_id=user_id).all()
+    print(myQuestion)
+    return render_template('myQuestion.html', myQuestion=myQuestion)
+
+
+@app.route('/DoubtSolved')
+def DoubtSolved():
+    id = request.args
     print(id)
     q = Question.query.get(id)
-    user=q.askedby_id
-    email=User.query.get(user).email
-    return render_template('ParticularQuestion.html',question=q,email=email)
+    return render_template('DoubtSolved.html', q=q)
 
+
+@app.route('/payment')
+def payment():
+    details = request.args
+    mentor= str(details['doubt'])
+    print('m is',mentor)
+    amt= details['amount']
+    user_id = session['user']
+    u = User.query.get(user_id)
+    mentor=User.query.filter_by(email=mentor).first()
+    topay=User.query.get(mentor.id)
+    print('mentor is  ', topay)
+    if u.score>0:
+        print(u.score)
+        u.score=u.score-int(amt)
+        topay.score+=int(amt)
+        db.session.commit()
+
+        #return None
+        return redirect(url_for('index'))
+    else:
+        return render_template('4o4.html', display_content="Transcation unsuccessul due to lack of credits")
 @app.route('/history')
 def history():
     return 'History'
