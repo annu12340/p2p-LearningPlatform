@@ -76,6 +76,14 @@ def showQuestion():
     return render_template('showQuestion.html', showQuestion=showQuestion)
 
 
+@app.route('/scoreBoard')
+def scoreBoard():
+    rank_user = User.query.order_by(desc(User.score))
+    return render_template('scoreBoard.html', rank_user=rank_user)
+    
+    
+
+
 
 ####################################  OTHER ROUTES  #########################################
 
