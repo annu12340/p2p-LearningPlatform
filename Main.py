@@ -11,7 +11,7 @@ db = SQLAlchemy(app)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(50))
+    username = db.Column(db.String(50))
     password = db.Column(db.String(50))
     score = db.Column(db.Integer, default=200)
 
@@ -26,7 +26,7 @@ class Question(db.Model):
 
 class Response(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(50))
+    username = db.Column(db.String(50))
     description = db.Column(db.String(200))
     pay = db.Column(db.Integer)
     questionID   = db.Column(db.Integer, db.ForeignKey('question.id'))
@@ -40,9 +40,9 @@ def login():
     if request.method == 'GET':
         return render_template('login.html')
     else:
-        email = request.form['email']
+        username = request.form['username']
         password = request.form['password']
-        data = User.query.filter_by(email=email,
+        data = User.query.filter_by(username=username,
                                     password=password).first()
 
         if data is not None:
@@ -55,7 +55,7 @@ def login():
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        new_user = User(email=request.form['email'],
+        new_user = User(username=request.form['username'],
                         password=request.form['password'])
         db.session.add(new_user)
         db.session.commit()
@@ -65,7 +65,7 @@ def register():
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
-    session.pop('email', None)
+    session.pop('username', None)
     return redirect(url_for('login'))
 
 
@@ -83,22 +83,18 @@ def showQuestion():
     return render_template('showQuestion.html', showQuestion=showQuestion)
 
 
-
-@app.route('/scoreBoard')
-def scoreBoard():
-    rank_user = User.query.order_by(desc(User.score))
-    return render_template('scoreBoard.html', rank_user=rank_user)
-    
-    
-
-
-
 @app.route('/showResponse')
 def showResponse():
     showResponse = Response.query.all()
     return render_template('showResponse.html', showResponse=showResponse)
 
 ####################################  OTHER ROUTES  #########################################
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/landingPage')
+def landingPage():
+    return render_template('landingPage.html')
+
 
 
 @app.route('/index')
@@ -107,7 +103,7 @@ def index():
     return render_template('index.html', showQuestion=showQuestion)
 
 
-@app.route('/', methods=['GET', 'POST'])
+
 @app.route('/add', methods=['GET', 'POST'])
 def add():
     if request.method == 'POST':
@@ -118,7 +114,7 @@ def add():
                                 pay=request.form['pay'], askedby_id=user_id)
         db.session.add(new_question)
         db.session.commit()
-        return redirect(url_for('showQuestion'))
+        return redirect(url_for('index'))
     else:
 
         return render_template('AddQuestion.html')
@@ -129,7 +125,7 @@ def ParticularQuestion():
     if request.method == 'POST':
         id = request.args
         print((id))
-        new_response = Response(email=request.form['email'],
+        new_response = Response(username=request.form['username'],
                         description=request.form['description'],
                             pay=request.form['pay'], questionID=request.form['id'])
         db.session.add(new_response)
@@ -140,11 +136,11 @@ def ParticularQuestion():
         print(id)
         q = Question.query.get(id)
         user = q.askedby_id
-        email = User.query.get(user).email
+        username = User.query.get(user).username
 
         response=Response.query.filter_by(questionID=q.id).all()
         print("response is",response)
-        return render_template('ParticularQuestion.html', question=q, email=email,response=response)
+        return render_template('ParticularQuestion.html', question=q, username=username,response=response)
 
 
 @app.route('/myQuestion')
@@ -171,7 +167,7 @@ def payment():
     amt= details['amount']
     user_id = session['user']
     u = User.query.get(user_id)
-    mentor=User.query.filter_by(email=mentor).first()
+    mentor=User.query.filter_by(username=mentor).first()
     topay=User.query.get(mentor.id)
     print('mentor is  ', topay)
     if u.score>0:
@@ -184,9 +180,12 @@ def payment():
         return redirect(url_for('index'))
     else:
         return render_template('4o4.html', display_content="Transcation unsuccessul due to lack of credits")
-@app.route('/history')
-def history():
-    return 'History'
+
+
+@app.route('/scoreBoard')
+def scoreBoard():
+    rank_user = User.query.order_by(desc(User.score))
+    return render_template('scoreBoard.html', rank_user=rank_user)
 
 
 ######################################### MAIN ####################################
