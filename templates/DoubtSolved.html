@@ -1,0 +1,30 @@
+{% extends "layout.html"%} {% block content%}
+
+<h1>Doubt solved</h1>
+<br>
+<b>
+    Id. {{q.id}}
+    <br> Question : {{q.question}}
+</b>
+<hr>
+<br>
+
+Amount promised to pay : {{q.pay}}
+<br><br>
+<form action="/payment">
+
+    <span style="font-size:15px">Since, your doubt is solved, please make the payment to the respective person</span>
+    <div class="form-group">
+
+        Enter email id <input type="text" name="doubt" class="form-control" placeholder="email id of the mentor"
+                              width="10">
+        Enter amount <input type="number" name="amount" class="form-control" placeholder="Amount">
+
+    </div>
+
+    <button type="submit" class="btn btn-dark text-center">Submit</button>
+</form>
+<br>
+
+
+{% endblock%}

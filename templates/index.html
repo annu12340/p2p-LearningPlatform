@@ -19,7 +19,11 @@
                     <td scope="row">{{ i.id }}</td>
                     <td>{{ i.question }} </td>
                     <td> {{i.pay }}</td>
-                   <td> <button class="btn btn-dark btn-sm"> View details</button></td>
+
+                            <td> <button  type="submit" class="btn btn-dark btn-sm"  value="{{ i.id }}">
+                                 <a href="{{ url_for('ParticularQuestion', id=i.id) }}"> View </a>
+                            </button></td>
+
                 </tr>
                 {% endfor %}
             </tbody>
