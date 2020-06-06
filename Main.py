@@ -168,7 +168,9 @@ def DoubtSolved():
 def Delete():
     id = int(request.args['id'])
     print('to be deleted ', id)
-
+    obj = Question.query.filter_by(id=id).one()
+    db.session.delete(obj)
+    db.session.commit()
     return render_template('index.html')
 
 
