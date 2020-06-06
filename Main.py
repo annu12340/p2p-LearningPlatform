@@ -41,7 +41,7 @@ def login():
         return render_template('login.html')
     else:
         username = request.form['username']
-        password = request.form['password']
+        password = hash(request.form['password'])
         data = User.query.filter_by(username=username,
                                     password=password).first()
 
@@ -49,6 +49,7 @@ def login():
             session['user'] = data.id
             print session['user']
             return redirect(url_for('index'))
+
         return render_template('incorrectLogin.html')
 
 
@@ -56,7 +57,8 @@ def login():
 def register():
     if request.method == 'POST':
         new_user = User(username=request.form['username'],
-                        password=request.form['password'])
+                        password=hash(request.form['password']))
+
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
