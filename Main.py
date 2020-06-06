@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
 
@@ -29,7 +29,7 @@ class Response(db.Model):
     username = db.Column(db.String(50))
     description = db.Column(db.String(200))
     pay = db.Column(db.Integer)
-    questionID   = db.Column(db.Integer, db.ForeignKey('question.id'))
+    questionID = db.Column(db.Integer, db.ForeignKey('question.id'))
 
 
 ################################  REGISTER  LOGIN  LOGOUT ROUTES ###################################
@@ -88,6 +88,7 @@ def showResponse():
     showResponse = Response.query.all()
     return render_template('showResponse.html', showResponse=showResponse)
 
+
 ####################################  OTHER ROUTES  #########################################
 
 @app.route('/', methods=['GET', 'POST'])
@@ -96,12 +97,13 @@ def landingPage():
     return render_template('landingPage.html')
 
 
-
 @app.route('/index')
 def index():
+    username = User.query.get(session['user']).username
+    print(username)
+    flash("welcome {}".format(username))
     showQuestion = Question.query.order_by(desc(Question.id))
     return render_template('index.html', showQuestion=showQuestion)
-
 
 
 @app.route('/add', methods=['GET', 'POST'])
@@ -112,8 +114,11 @@ def add():
         new_question = Question(question=request.form['question'],
                                 description=request.form['description'],
                                 pay=request.form['pay'], askedby_id=user_id)
+        flash("New question has been succesfully added")
         db.session.add(new_question)
+
         db.session.commit()
+
         return redirect(url_for('index'))
     else:
 
@@ -126,8 +131,8 @@ def ParticularQuestion():
         id = request.args
         print((id))
         new_response = Response(username=request.form['username'],
-                        description=request.form['description'],
-                            pay=request.form['pay'], questionID=request.form['id'])
+                                description=request.form['description'],
+                                pay=request.form['pay'], questionID=request.form['id'])
         db.session.add(new_response)
         db.session.commit()
         return redirect(url_for('index'))
@@ -138,9 +143,9 @@ def ParticularQuestion():
         user = q.askedby_id
         username = User.query.get(user).username
 
-        response=Response.query.filter_by(questionID=q.id).all()
-        print("response is",response)
-        return render_template('ParticularQuestion.html', question=q, username=username,response=response)
+        response = Response.query.filter_by(questionID=q.id).all()
+        print("response is", response)
+        return render_template('ParticularQuestion.html', question=q, username=username, response=response)
 
 
 @app.route('/myQuestion')
@@ -159,24 +164,33 @@ def DoubtSolved():
     return render_template('DoubtSolved.html', q=q)
 
 
+@app.route('/Delete')
+def Delete():
+    id = int(request.args['id'])
+    print('to be deleted ', id)
+
+    return render_template('index.html')
+
+
+
 @app.route('/payment')
 def payment():
     details = request.args
-    mentor= str(details['doubt'])
-    print('m is',mentor)
-    amt= details['amount']
+    print(details)
+    mentor = str(details['doubt'])
+    print('m is', mentor)
+    amt = details['amount']
     user_id = session['user']
     u = User.query.get(user_id)
-    mentor=User.query.filter_by(username=mentor).first()
-    topay=User.query.get(mentor.id)
+    mentor = User.query.filter_by(username=mentor).first()
+    topay = User.query.get(mentor.id)
     print('mentor is  ', topay)
-    if u.score>0:
+    if u.score > 0:
+        flash("Payment successully made")
         print(u.score)
-        u.score=u.score-int(amt)
-        topay.score+=int(amt)
+        u.score = u.score - int(amt)
+        topay.score += int(amt)
         db.session.commit()
-
-        #return None
         return redirect(url_for('index'))
     else:
         return render_template('4o4.html', display_content="Transcation unsuccessul due to lack of credits")

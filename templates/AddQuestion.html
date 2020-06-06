@@ -5,6 +5,19 @@
 
     <div class="col-12">
         <h1>Add Question</h1>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-primary alert-dismissible fade show" role="alert" id="flashMessage"
+             style="display:none">
+            <span>{{ message }}</span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true" onclick=delete_flash(this)>&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
         <form action="" method="post">
             <div class="form-group">
                 <input type="text" name="question" class="form-control" placeholder="Enter Question">
@@ -14,9 +27,9 @@
                 <input type="text" name="description" class="form-control" placeholder="Description">
             </div>
             <br>
-             <p style="font-size:20px;"> I am ready to pay </p>
+            <p style="font-size:20px;"> I am ready to pay </p>
             <div class="form-group">
-                <input type="number" name="pay" class="form-control" placeholder="Enter amount" >
+                <input type="number" name="pay" class="form-control" placeholder="Enter amount">
             </div>
 
             <button type="submit" class="btn btn-dark text-center">Add</button>

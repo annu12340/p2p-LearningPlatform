@@ -1,6 +1,21 @@
 {% extends "layout.html"%} {% block content%}
 
 <h1>Doubt solved</h1>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-primary alert-dismissible fade show" role="alert" id="flashMessage"
+     style="display:none">
+    <span>{{ message }}</span>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true" onclick=delete_flash(this)>&times;</span>
+    </button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
 <br>
 <b>
     Id. {{q.id}}
@@ -23,6 +38,7 @@ Amount promised to pay : {{q.pay}}
     </div>
 
     <button type="submit" class="btn btn-dark text-center">Submit</button>
+
 </form>
 <br>
 
