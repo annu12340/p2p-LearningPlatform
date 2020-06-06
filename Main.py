@@ -47,7 +47,7 @@ def login():
 
         if data is not None:
             session['user'] = data.id
-            print session['user']
+            print(session['user'])
             return redirect(url_for('index'))
 
         return render_template('incorrectLogin.html')
@@ -174,7 +174,6 @@ def Delete():
     db.session.delete(obj)
     db.session.commit()
     return render_template('index.html')
-
 
 
 @app.route('/payment')
